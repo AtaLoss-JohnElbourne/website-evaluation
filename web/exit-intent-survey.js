@@ -3,12 +3,42 @@
   const CONFIG = {
     // Triggering
     armAfterMs: 10000,        // detector "arms" after 10s (0 to arm immediately)
-    fallbackAfterMs: 90000,  // backup timer; 90s on desktop, 45s on mobile
+    fallbackAfterMs: {
+      mobile: 45000,          // 45s fallback timer on mobile devices
+      desktop: 0              // disabled on desktop (exit-intent only)
+    },
     topThresholdPx: 12,       // pixels from top to count as exit intent
     oncePerSession: true,     // don't show more than once per tab session
 
     // UX / style
     brandColor: '#6D5DF6',    // Feedback button + primary accents
+
+    // UI Text & Labels
+    ui: {
+      title: 'Website Survey',
+      subtitle: "To improve our website, we're running this survey for two weeks.",
+      step1Instruction: 'Choose one option:',
+      requiredIndicator: '(required)',
+      otherPlaceholder: 'Please explain...',
+      buttons: {
+        more: 'More',
+        back: 'Back',
+        submit: 'Submit'
+      }
+    },
+
+    // Form Validation
+    validation: {
+      otherTextMaxLength: 200,
+      commentsMaxLength: 500
+    },
+
+    // API Configuration
+    api: {
+      endpoint: 'https://elbourne.me.uk/survey-api/api/survey',
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'}
+    },
 
     // Frequency capping
     ttlDays: 28,              // don't auto-show again for this many days (set to 28 for 2-week survey campaign)
@@ -122,29 +152,29 @@
       }
     },
 
-    // Called on submit – connects directly to the survey API server
-    onSubmit: async (payload) => {
-      try {
-        const response = await fetch('https://elbourne.me.uk/survey-api/api/survey', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('Survey submitted successfully:', result);
-        return result;
-      } catch (error) {
-        console.error('Error submitting survey:', error);
-        throw error;
-      }
-    },
-
     debug: false
+  };
+
+  /* -----------------------  SUBMISSION HANDLER  ----------------------- */
+  const submitSurvey = async (payload) => {
+    try {
+      const response = await fetch(CONFIG.api.endpoint, {
+        method: CONFIG.api.method,
+        headers: CONFIG.api.headers,
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('Survey submitted successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('Error submitting survey:', error);
+      throw error;
+    }
   };
 
   /* --- Do not run on Squarespace domains --- */
@@ -545,12 +575,12 @@
 
         <!-- STEP 1 -->
         <div class="es-body" data-step="1">
-          <div class="es-title">Website Survey</div>
+          <div class="es-title">${CONFIG.ui.title}</div>
           <div class="es-message-prominent">
-            <p class="es-message-text">To improve our website, we're running this survey for two weeks.</p>
+            <p class="es-message-text">${CONFIG.ui.subtitle}</p>
           </div>
-          <div class="es-step-title">${CONFIG.question}<span class="es-required"> (required)</span></div>
-          <div class="es-sub">Choose one option:</div>
+          <div class="es-step-title">${CONFIG.question}<span class="es-required"> ${CONFIG.ui.requiredIndicator}</span></div>
+          <div class="es-sub">${CONFIG.ui.step1Instruction}</div>
           <form id="es-step1" class="es-list">
             ${CONFIG.options.map((opt, i) => `
               <label class="es-option" for="es-${opt.id}">
@@ -561,7 +591,7 @@
             `).join('')}
           </form>
           <div class="es-actions">
-            <button type="button" class="es-more" id="es-more-1" disabled>More</button>
+            <button type="button" class="es-more" id="es-more-1" disabled>${CONFIG.ui.buttons.more}</button>
           </div>
         </div>
 
@@ -573,7 +603,7 @@
               <legend class="es-label">${CONFIG.step2.visitingReasons.question} <span class="es-required" aria-hidden="true">${CONFIG.step2.visitingReasons.subtitle}</span></legend>
               ${CONFIG.step2.visitingReasons.options.map(opt => `
                 <label class="es-radio"><input type="checkbox" name="visiting_reasons" value="${opt.id}"${opt.hasOther ? ` id="visiting_other_cb"` : ''}> ${opt.label}</label>
-                ${opt.hasOther ? `<div class="es-field es-hidden" id="visiting_other_text"><input type="text" name="visiting_reasons_other" class="es-input" placeholder="Please explain..." maxlength="200"></div>` : ''}
+                ${opt.hasOther ? `<div class="es-field es-hidden" id="visiting_other_text"><input type="text" name="visiting_reasons_other" class="es-input" placeholder="${CONFIG.ui.otherPlaceholder}" maxlength="${CONFIG.validation.otherTextMaxLength}"></div>` : ''}
               `).join('')}
             </fieldset>
 
@@ -582,7 +612,7 @@
               <legend class="es-label">${CONFIG.step2.visitingFor.question} <span class="es-required" aria-hidden="true">${CONFIG.step2.visitingFor.subtitle}</span></legend>
               ${CONFIG.step2.visitingFor.options.map(opt => `
                 <label class="es-radio"><input type="checkbox" name="visiting_for" value="${opt.id}"${opt.hasOther ? ` id="visiting_for_other_cb"` : ''}> ${opt.label}</label>
-                ${opt.hasOther ? `<div class="es-field es-hidden" id="visiting_for_other_text"><input type="text" name="visiting_for_other" class="es-input" placeholder="Please explain..." maxlength="200"></div>` : ''}
+                ${opt.hasOther ? `<div class="es-field es-hidden" id="visiting_for_other_text"><input type="text" name="visiting_for_other" class="es-input" placeholder="${CONFIG.ui.otherPlaceholder}" maxlength="${CONFIG.validation.otherTextMaxLength}"></div>` : ''}
               `).join('')}
             </fieldset>
 
@@ -595,13 +625,13 @@
                 `).join('')}
               </select>
               <div class="es-field es-hidden" id="heard_other_text">
-                <input type="text" name="heard_where_other" class="es-input" placeholder="Please explain..." maxlength="200">
+                <input type="text" name="heard_where_other" class="es-input" placeholder="${CONFIG.ui.otherPlaceholder}" maxlength="${CONFIG.validation.otherTextMaxLength}">
               </div>
             </div>
           </form>
           <div class="es-actions">
-            <button type="button" class="es-back" id="es-back-2">Back</button>
-            <button type="button" class="es-more" id="es-more-2">More</button>
+            <button type="button" class="es-back" id="es-back-2">${CONFIG.ui.buttons.back}</button>
+            <button type="button" class="es-more" id="es-more-2">${CONFIG.ui.buttons.more}</button>
           </div>
         </div>
 
@@ -640,13 +670,13 @@
               <legend class="es-label">${CONFIG.step3.barriers.question} <span class="es-required" aria-hidden="true">${CONFIG.step3.barriers.subtitle}</span></legend>
               ${CONFIG.step3.barriers.options.map(opt => `
                 <label class="es-radio"><input type="checkbox" name="barriers" value="${opt.id}"${opt.hasOther ? ` id="barriers_other_cb"` : ''}> ${opt.label}</label>
-                ${opt.hasOther ? `<div class="es-field es-hidden" id="barriers_other_text"><input type="text" name="barriers_other" class="es-input" placeholder="Please explain..." maxlength="200"></div>` : ''}
+                ${opt.hasOther ? `<div class="es-field es-hidden" id="barriers_other_text"><input type="text" name="barriers_other" class="es-input" placeholder="${CONFIG.ui.otherPlaceholder}" maxlength="${CONFIG.validation.otherTextMaxLength}"></div>` : ''}
               `).join('')}
             </fieldset>
 
             <div class="es-field">
               <!-- Hidden textarea to maintain form logic, always returns null -->
-              <textarea id="es-comments" name="comments" class="es-textarea es-hidden" maxlength="500"></textarea>
+              <textarea id="es-comments" name="comments" class="es-textarea es-hidden" maxlength="${CONFIG.validation.commentsMaxLength}"></textarea>
               
               <!-- Message instead of free text input -->
               <div class="es-message-prominent">
@@ -656,8 +686,8 @@
           </form>
 
           <div class="es-actions">
-            <button type="button" class="es-back"   id="es-back-3">Back</button>
-            <button type="button" class="es-submit" id="es-submit-3">Submit</button>
+            <button type="button" class="es-back"   id="es-back-3">${CONFIG.ui.buttons.back}</button>
+            <button type="button" class="es-submit" id="es-submit-3">${CONFIG.ui.buttons.submit}</button>
           </div>
         </div>
       </div>
@@ -728,7 +758,7 @@
       if (stage >= 2) Object.assign(p, collectStep2());
       if (stage >= 3) Object.assign(p, collectStep3());
 
-      try { await CONFIG.onSubmit(p); } catch (e) { console.error(e); }
+      try { await submitSurvey(p); } catch (e) { console.error(e); }
 
       // Persist state for TTL + re-submissions (include sessionId for consistency)
       state = { 
@@ -910,15 +940,14 @@
 
   if (!suppressAuto) {
     document.addEventListener('mouseout', onMouseOut);
-    if (typeof CONFIG.fallbackAfterMs === 'number' && CONFIG.fallbackAfterMs > 0) {
-      // Use different timing for mobile vs desktop
-      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                      (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
-      const fallbackDelay = isMobile ? 45000 : 0; // 45s mobile, disabled on desktop
-      
-      if (fallbackDelay > 0) {
-        fallbackTimer = setTimeout(() => { if (canShow()) trigger('fallback'); }, fallbackDelay);
-      }
+    
+    // Set up fallback timer based on device type
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+    const fallbackDelay = isMobile ? CONFIG.fallbackAfterMs.mobile : CONFIG.fallbackAfterMs.desktop;
+    
+    if (fallbackDelay > 0) {
+      fallbackTimer = setTimeout(() => { if (canShow()) trigger('fallback'); }, fallbackDelay);
     }
   }
 
@@ -935,12 +964,13 @@ window.ExitSurvey = {
     // Re-arm exit intent
     if (!suppressAuto) {
       document.addEventListener('mouseout', onMouseOut);
-      if (typeof CONFIG.fallbackAfterMs === 'number' && CONFIG.fallbackAfterMs > 0) {
-        // Use different timing for mobile vs desktop
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                        (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
-        const fallbackDelay = isMobile ? 45000 : CONFIG.fallbackAfterMs; // 45s mobile, 90s desktop
-        
+      
+      // Set up fallback timer based on device type
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                      (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+      const fallbackDelay = isMobile ? CONFIG.fallbackAfterMs.mobile : CONFIG.fallbackAfterMs.desktop;
+      
+      if (fallbackDelay > 0) {
         fallbackTimer = setTimeout(() => { if (canShow()) trigger('fallback'); }, fallbackDelay);
       }
     }
@@ -978,7 +1008,7 @@ window.ExitSurvey = {
     if (step >= 2) Object.assign(p, collectStep2());
     if (step >= 3) Object.assign(p, collectStep3());
 
-    try { CONFIG.onSubmit(p); } catch (e) { console.error(e); }
+    try { submitSurvey(p); } catch (e) { console.error(e); }
 
     // Persist state for TTL + re-submissions (include sessionId for consistency)
     state = { 
