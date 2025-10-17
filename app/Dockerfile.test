@@ -1,0 +1,45 @@
+# Multi-stage Dockerfile with test stage
+# Use the official Node.js runtime as the base image
+FROM node:18-alpine AS base
+
+# Install debugging tools (curl and jq)
+RUN apk add --no-cache curl jq
+
+# Create a non-root user first
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Set the working directory and ensure nodejs user owns it
+WORKDIR /usr/src/app
+RUN chown nodejs:nodejs /usr/src/app
+
+# Copy package.json and package-lock.json with correct ownership
+COPY --chown=nodejs:nodejs package*.json ./
+
+# Switch to nodejs user before npm install
+USER nodejs
+
+# Install all dependencies (including dev dependencies for testing)
+RUN npm install
+
+# Copy the rest of the application code with correct ownership
+COPY --chown=nodejs:nodejs . .
+
+# Test stage
+FROM base AS test
+ENV NODE_ENV=test
+# Run tests
+RUN npm test
+
+# Production stage
+FROM base AS production
+# Remove dev dependencies for production
+RUN npm prune --omit=dev
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Define environment variable
+ENV NODE_ENV=production
+
+# Command to run the application
+CMD ["node", "server.js"]

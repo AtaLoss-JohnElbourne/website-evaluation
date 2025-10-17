@@ -1,0 +1,56 @@
+services:
+  survey-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: survey_api
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Azure credentials - loaded from .env file
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      # SharePoint configuration
+      - SHAREPOINT_SITE_URL=${SHAREPOINT_SITE_URL}
+      - EXCEL_FILE_PATH=${EXCEL_FILE_PATH}
+      - WORKSHEET_NAME=${WORKSHEET_NAME}
+      - TABLE_NAME=${TABLE_NAME}
+      # Debug configuration
+      - ENABLE_DEBUG_ENDPOINTS=${ENABLE_DEBUG_ENDPOINTS}
+      - DEBUG_PASSWORD=${DEBUG_PASSWORD}
+    env_file:
+      - .env
+    networks:
+      - frontend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  survey-web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+    container_name: survey_api_web
+    restart: unless-stopped
+    ports:
+      - "3003:3001"
+    networks:
+      - frontend
+    depends_on:
+      - survey-api
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/exit-intent-survey.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  frontend:
+    external: true

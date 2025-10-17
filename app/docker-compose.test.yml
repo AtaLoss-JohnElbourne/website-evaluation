@@ -1,0 +1,77 @@
+services:
+  survey-api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: test
+    environment:
+      - NODE_ENV=test
+      - PORT=3001
+      # Test Azure credentials
+      - AZURE_CLIENT_ID=test-client-id
+      - AZURE_CLIENT_SECRET=test-client-secret
+      - AZURE_TENANT_ID=test-tenant-id
+      # Test SharePoint configuration
+      - SHAREPOINT_SITE_URL=https://test.sharepoint.com/sites/test
+      - EXCEL_FILE_PATH=/test/file.xlsx
+      - WORKSHEET_NAME=TestSheet
+      - TABLE_NAME=TestTable
+      # Test debug configuration
+      - ENABLE_DEBUG_ENDPOINTS=true
+      - DEBUG_PASSWORD=test123
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm test
+    
+  # Optional: Test with coverage
+  survey-api-test-coverage:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: test
+    environment:
+      - NODE_ENV=test
+      - PORT=3001
+      # Test Azure credentials
+      - AZURE_CLIENT_ID=test-client-id
+      - AZURE_CLIENT_SECRET=test-client-secret
+      - AZURE_TENANT_ID=test-tenant-id
+      # Test SharePoint configuration
+      - SHAREPOINT_SITE_URL=https://test.sharepoint.com/sites/test
+      - EXCEL_FILE_PATH=/test/file.xlsx
+      - WORKSHEET_NAME=TestSheet
+      - TABLE_NAME=TestTable
+      # Test debug configuration
+      - ENABLE_DEBUG_ENDPOINTS=true
+      - DEBUG_PASSWORD=test123
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run test:coverage
+    
+  # Contract testing specifically
+  survey-api-test-contracts:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: test
+    environment:
+      - NODE_ENV=test
+      - PORT=3001
+      # Test Azure credentials
+      - AZURE_CLIENT_ID=test-client-id
+      - AZURE_CLIENT_SECRET=test-client-secret
+      - AZURE_TENANT_ID=test-tenant-id
+      # Test SharePoint configuration
+      - SHAREPOINT_SITE_URL=https://test.sharepoint.com/sites/test
+      - EXCEL_FILE_PATH=/test/file.xlsx
+      - WORKSHEET_NAME=TestSheet
+      - TABLE_NAME=TestTable
+      # Test debug configuration
+      - ENABLE_DEBUG_ENDPOINTS=true
+      - DEBUG_PASSWORD=test123
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run test:contracts
