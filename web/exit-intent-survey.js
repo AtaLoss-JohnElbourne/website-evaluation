@@ -196,14 +196,14 @@
 
   /* -----------------------  STYLES  ----------------------- */
   const styles = `
-  :root { --es-brand:${CONFIG.brandColor}; --es-text:#111827; --es-subtle:#6b7280; --es-bg:#fff; --es-ring: rgba(109,93,246,.35); }
+  :root { --es-brand:${CONFIG.brandColor}; --es-text:#111827; --es-subtle:#6b7280; --es-bg:#fff; --es-ring: rgba(109,93,246,.35); --es-font: PlusJakartaSans-Light, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
   .es-hidden { display:none !important; }
   [hidden] { display:none !important; }
 
   .es-fab {
     position: fixed; right: 16px; bottom: 16px; z-index: 2147483000;
     background: var(--es-brand); color: #fff; border: 0; border-radius: 14px;
-    padding: 12px 16px; font: 600 15px/1.1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    padding: 12px 16px; font: 600 15px/1.1 var(--es-font);
     box-shadow: 0 10px 25px rgba(0,0,0,.15); cursor: pointer;
   }
   .es-fab:focus { outline: 3px solid var(--es-ring); outline-offset: 2px; }
@@ -222,11 +222,11 @@
   .es-dialog, .es-dialog * { box-sizing: border-box; }
 
   .es-header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 6px; }
-  .es-title { font: 700 18px/1.2 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+  .es-title { font: 700 18px/1.2 var(--es-font); }
   .es-body .es-title { margin-bottom: 20px; } /* Add space when title is in body (Step 1) */
-  .es-subtitle { font: 400 18px/1.2 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color: var(--es-subtle); margin-bottom: 16px; }
-  .es-step-title { font: 600 16px/1.3 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color: var(--es-text); margin-bottom: 4px; }
-  .es-required { color: var(--es-subtle); font-weight: 500; margin-left: 6px; font-size: 12px; }
+  .es-subtitle { font: 400 18px/1.2 var(--es-font); color: var(--es-subtle); margin-bottom: 16px; }
+  .es-step-title { font: 600 16px/1.3 var(--es-font); color: var(--es-text); margin-bottom: 4px; }
+  .es-required { color: var(--es-subtle); font-weight: 500; margin-left: 6px; font-size: 14px; }
 
   .es-close {
     appearance:none; border:0; background:transparent; font-size:20px; line-height:1; padding:6px; margin:-6px;
@@ -245,8 +245,8 @@
   .es-stars { display:inline-flex; gap:3px; }
   .es-star { width:18px; height:18px; display:inline-block; }
 
-  .es-label { font: 500 14px/1.2 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:#111827; }
-  .es-sub { color:var(--es-subtle); font: 500 12px/1.2 ui-sans-serif,system-ui; margin-bottom:6px; }
+  .es-label { font: 500 14px/1.2 var(--es-font); color:#111827; }
+  .es-sub { color:var(--es-subtle); font: 500 14px/1.2 var(--es-font); margin-bottom:6px; }
 
   .es-form { display:grid; gap:16px; margin-bottom: 8px; } /* Added bottom margin to create space before buttons */
   .es-field { display:grid; gap:8px; } /* Increased from 6px to 8px */
@@ -255,7 +255,7 @@
 
   .es-input, .es-select, .es-textarea {
     width:100%; border-radius:12px; border:1px solid #e5e7eb; padding:10px 12px;
-    font:400 14px/1.35 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font:400 14px/1.35 var(--es-font);
   }
   .es-input:focus, .es-select:focus, .es-textarea:focus {
     outline: 3px solid var(--es-ring); outline-offset: 2px; border-color: var(--es-brand);
@@ -296,22 +296,22 @@
   }
   .es-message-text {
     margin: 0;
-    font: 400 14px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font: 400 14px/1.4 var(--es-font);
     color: var(--es-subtle);
   }
   .es-message-prominent .es-message-text {
-    font: 400 14px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font: 400 14px/1.4 var(--es-font);
     color: #000000;
   }
   
   /* Larger text for first screen subtitle only */
   .es-body[data-step="1"] .es-message-prominent .es-message-text {
-    font: 400 18px/1.2 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font: 400 18px/1.2 var(--es-font);
   }
   
   /* Ensure final screen uses smaller text */
   .es-body[data-step="3"] .es-message-prominent .es-message-text {
-    font: 400 14px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial !important;
+    font: 400 14px/1.4 var(--es-font) !important;
   }
     color: var(--es-subtle);
   }
@@ -331,7 +331,7 @@
     justify-content: flex-end !important;
   }
   .es-more, .es-submit, .es-back {
-    border:0; border-radius:12px; padding: 12px 18px; font: 700 14px/1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    border:0; border-radius:12px; padding: 12px 18px; font: 700 14px/1 var(--es-font);
     cursor:pointer;
     flex-shrink: 0 !important;
   }
@@ -350,7 +350,7 @@
   .es-toast {
     position: fixed; left:50%; transform: translateX(-50%);
     bottom: 24px; background:#111827; color:#fff; padding:10px 14px; border-radius:12px; z-index:2147483002;
-    font: 600 13px/1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font: 600 14px/1 var(--es-font);
     box-shadow: 0 12px 28px rgba(0,0,0,.25);
   }
 
@@ -508,10 +508,14 @@
   // Global collector functions accessible by both modal and unload handlers
   const collectStep1 = () => {
     const opt = CONFIG.options.find(o => o.id === selected);
+    const step1CommentsField = modal?.querySelector('#es-step1-comments-text');
+    const step1Comments = step1CommentsField ? (step1CommentsField.value || '').trim() : '';
+    
     return {
       selected: selected || null,
       label:   opt?.label || null,
-      stars:   opt?.stars || null
+      stars:   opt?.stars || null,
+      comments: step1Comments || null // Include step1 comments in the comments field
     };
   };
 
@@ -548,13 +552,21 @@
     const fd = new FormData(step3);
     const barriers = [...step3.querySelectorAll('input[name="barriers"]:checked')].map(cb => cb.value);
     const barriersOther = fd.get('barriers_other') || null;
+    
+    // Get step 3 comments (hidden textarea)
+    const step3Comments = (fd.get('comments') || '').trim() || null;
+    
+    // Get step 1 comments if they exist and have priority
+    const step1Data = collectStep1();
+    const finalComments = step1Data.comments || step3Comments;
+    
     return {
       ageGroup:  fd.get('ageGroup') || null,
       gender:    fd.get('gender')   || null,
       ethnicity: fd.get('ethnicity')|| null,
       barriers:  barriers.length ? barriers : null,
       barriersOther: barriersOther,
-      comments:  (fd.get('comments') || '').trim() || null
+      comments:  finalComments
     };
   };
 
@@ -590,6 +602,16 @@
               </label>
             `).join('')}
           </form>
+          
+          <!-- Conditional text field for 1-2 star ratings -->
+          <div class="es-field es-hidden" id="es-step1-comments" style="margin-top: 24px; margin-bottom: 20px;">
+            <label for="es-step1-comments-text" class="es-label">Please tell us more about your experience:</label>
+            <textarea id="es-step1-comments-text" name="step1_comments" class="es-textarea" maxlength="500" placeholder="Your feedback helps us improve the website..."></textarea>
+            <div class="es-char-count" style="font-size: 14px; color: var(--es-subtle); text-align: right; margin-top: 4px; font-family: var(--es-font);">
+              <span id="es-step1-char-count">0</span>/500 characters
+            </div>
+          </div>
+          
           <div class="es-actions">
             <button type="button" class="es-more" id="es-more-1" disabled>${CONFIG.ui.buttons.more}</button>
           </div>
@@ -711,12 +733,49 @@
     const step1 = modal.querySelector('#es-step1');
     const more1 = modal.querySelector('#es-more-1');
     const radios1 = [...step1.querySelectorAll('input[name="helpfulness"]')];
+    const step1CommentsField = modal.querySelector('#es-step1-comments');
+    const step1Textarea = modal.querySelector('#es-step1-comments-text');
+    const step1CharCount = modal.querySelector('#es-step1-char-count');
 
     const enableStep1Buttons = () => {
       selected = radios1.find(r => r.checked)?.value || null;
       const enabled = !!selected;
       more1.disabled = !enabled;
+      
+      // Show/hide comments field based on star rating (1-2 stars)
+      if (selected) {
+        const opt = CONFIG.options.find(o => o.id === selected);
+        const showComments = opt && opt.stars <= 2;
+        step1CommentsField.classList.toggle('es-hidden', !showComments);
+        
+        if (showComments && step1Textarea) {
+          setTimeout(() => step1Textarea.focus(), 100);
+        } else if (step1Textarea) {
+          step1Textarea.value = ''; // Clear text when hiding
+        }
+      } else {
+        step1CommentsField.classList.add('es-hidden');
+        if (step1Textarea) step1Textarea.value = '';
+      }
     };
+    
+    // Character counter for step 1 comments
+    if (step1Textarea && step1CharCount) {
+      step1Textarea.addEventListener('input', () => {
+        const length = step1Textarea.value.length;
+        step1CharCount.textContent = length;
+        
+        // Optional: Change color when approaching limit
+        if (length > 450) {
+          step1CharCount.style.color = '#ef4444'; // Red
+        } else if (length > 400) {
+          step1CharCount.style.color = '#f59e0b'; // Orange
+        } else {
+          step1CharCount.style.color = 'var(--es-subtle)'; // Default
+        }
+      });
+    }
+    
     radios1.forEach(r => r.addEventListener('change', enableStep1Buttons));
     enableStep1Buttons();
 
