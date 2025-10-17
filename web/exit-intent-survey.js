@@ -21,7 +21,7 @@
       requiredIndicator: '(required)',
       otherPlaceholder: 'Please explain...',
       buttons: {
-        more: 'More',
+        more: 'Next',
         back: 'Back',
         submit: 'Submit'
       }
@@ -225,8 +225,8 @@
   .es-title { font: 700 18px/1.2 var(--es-font); }
   .es-body .es-title { margin-bottom: 20px; } /* Add space when title is in body (Step 1) */
   .es-subtitle { font: 400 18px/1.2 var(--es-font); color: var(--es-subtle); margin-bottom: 16px; }
-  .es-step-title { font: 600 16px/1.3 var(--es-font); color: var(--es-text); margin-bottom: 4px; }
-  .es-required { color: var(--es-subtle); font-weight: 500; margin-left: 6px; font-size: 14px; }
+  .es-step-title { font: 600 17px/1.3 var(--es-font); color: var(--es-text); margin-bottom: 4px; }
+  .es-required { color: var(--es-subtle); font-weight: 500; margin-left: 6px; font-size: 17px; }
 
   .es-close {
     appearance:none; border:0; background:transparent; font-size:20px; line-height:1; padding:6px; margin:-6px;
@@ -245,8 +245,8 @@
   .es-stars { display:inline-flex; gap:3px; }
   .es-star { width:18px; height:18px; display:inline-block; }
 
-  .es-label { font: 500 14px/1.2 var(--es-font); color:#111827; }
-  .es-sub { color:var(--es-subtle); font: 500 14px/1.2 var(--es-font); margin-bottom:6px; }
+  .es-label { font: 600 17px/1.2 var(--es-font); color:#111827; }
+  .es-sub { color:var(--es-subtle); font: 500 17px/1.2 var(--es-font); margin-bottom:6px; }
 
   .es-form { display:grid; gap:16px; margin-bottom: 8px; } /* Added bottom margin to create space before buttons */
   .es-field { display:grid; gap:8px; } /* Increased from 6px to 8px */
@@ -255,7 +255,7 @@
 
   .es-input, .es-select, .es-textarea {
     width:100%; border-radius:12px; border:1px solid #e5e7eb; padding:10px 12px;
-    font:400 14px/1.35 var(--es-font);
+    font:400 17px/1.35 var(--es-font);
   }
   .es-input:focus, .es-select:focus, .es-textarea:focus {
     outline: 3px solid var(--es-ring); outline-offset: 2px; border-color: var(--es-brand);
@@ -272,7 +272,7 @@
     margin-bottom: 8px; /* Add bottom margin to prevent cramping */
   }
   .es-field .es-field .es-input {
-    font-size: 14px; /* Increased from 13px to match other inputs */
+    font-size: 17px; /* Increased from 13px to match other inputs */
     padding: 10px 12px; /* Increased padding for better touch targets */
     border-color: #d1d5db;
     width: 100%; /* Ensure full width */
@@ -296,11 +296,11 @@
   }
   .es-message-text {
     margin: 0;
-    font: 400 14px/1.4 var(--es-font);
+    font: 400 17px/1.4 var(--es-font);
     color: var(--es-subtle);
   }
   .es-message-prominent .es-message-text {
-    font: 400 14px/1.4 var(--es-font);
+    font: 400 17px/1.4 var(--es-font);
     color: #000000;
   }
   
@@ -311,7 +311,7 @@
   
   /* Ensure final screen uses smaller text */
   .es-body[data-step="3"] .es-message-prominent .es-message-text {
-    font: 400 14px/1.4 var(--es-font) !important;
+    font: 400 17px/1.4 var(--es-font) !important;
   }
     color: var(--es-subtle);
   }
@@ -331,7 +331,7 @@
     justify-content: flex-end !important;
   }
   .es-more, .es-submit, .es-back {
-    border:0; border-radius:12px; padding: 12px 18px; font: 700 14px/1 var(--es-font);
+    border:0; border-radius:12px; padding: 12px 18px; font: 700 17px/1 var(--es-font);
     cursor:pointer;
     flex-shrink: 0 !important;
   }
@@ -350,7 +350,7 @@
   .es-toast {
     position: fixed; left:50%; transform: translateX(-50%);
     bottom: 24px; background:#111827; color:#fff; padding:10px 14px; border-radius:12px; z-index:2147483002;
-    font: 600 14px/1 var(--es-font);
+    font: 600 17px/1 var(--es-font);
     box-shadow: 0 12px 28px rgba(0,0,0,.25);
   }
 
@@ -607,7 +607,7 @@
           <div class="es-field es-hidden" id="es-step1-comments" style="margin-top: 24px; margin-bottom: 20px;">
             <label for="es-step1-comments-text" class="es-label">Please tell us more about your experience:</label>
             <textarea id="es-step1-comments-text" name="step1_comments" class="es-textarea" maxlength="500" placeholder="Your feedback helps us improve the website..."></textarea>
-            <div class="es-char-count" style="font-size: 14px; color: var(--es-subtle); text-align: right; margin-top: 4px; font-family: var(--es-font);">
+            <div class="es-char-count" style="font-size: 17px; color: var(--es-subtle); text-align: right; margin-top: 4px; font-family: var(--es-font);">
               <span id="es-step1-char-count">0</span>/500 characters
             </div>
           </div>
