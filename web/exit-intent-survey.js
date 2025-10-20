@@ -378,6 +378,21 @@
   fab.textContent = 'Feedback';
   root.appendChild(fab);
 
+  // Update FAB text based on survey state
+  const updateFabText = () => {
+    const hasShown = sessionAlreadyShown();
+    if (hasShown) {
+      fab.textContent = 'Feedback.'; // Dot after = already triggered
+      fab.setAttribute('aria-label', 'Give feedback (survey completed)');
+    } else if (armed) {
+      fab.textContent = '.Feedback'; // Dot before = armed and ready
+      fab.setAttribute('aria-label', 'Give feedback (survey ready)');
+    } else {
+      fab.textContent = 'Feedback'; // No dot = not armed yet
+      fab.setAttribute('aria-label', 'Give feedback');
+    }
+  };
+
   // Lift FAB above Squarespace cookie banner (if present)
   (function keepFabAboveCookieBanner(){
     const BASE_BOTTOM = 16, GAP = 12;
@@ -970,6 +985,7 @@
     window.__ES_triggerSource = source;
     if (CONFIG.debug) console.log('[exit-survey] show via', source, `(site engagement: ${Math.round(getSiteEngagementTime()/1000)}s)`);
     openModal();
+    updateFabText(); // Update FAB after survey shown
     document.removeEventListener('mouseout', onMouseOut);
     if (fallbackTimer) clearTimeout(fallbackTimer);
   };
@@ -982,12 +998,16 @@
     const remainingArmTime = CONFIG.armAfterMs - siteEngagementMs;
     setTimeout(() => { 
       armed = true; 
+      updateFabText(); // Update FAB when armed
       if (CONFIG.debug) console.log('[exit-survey] armed after site engagement reached 10s'); 
     }, remainingArmTime);
   } else {
     armed = true;
     if (CONFIG.debug) console.log('[exit-survey] armed immediately (user already engaged for', Math.round(siteEngagementMs/1000) + 's)');
   }
+  
+  // Initial FAB text update
+  updateFabText();
 
   // exit-intent (desktop) – only when not suppressed by TTL
   const onMouseOut = (e) => {
