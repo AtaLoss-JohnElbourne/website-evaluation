@@ -1016,9 +1016,11 @@
     const nearTop = e.clientY <= threshold;
     const leavingDoc = e.relatedTarget === null;
     
-    // Only trigger on mouse movement toward browser chrome (nearTop), 
-    // not when clicking links within the site (leavingDoc)
-    if (nearTop && !leavingDoc) trigger('exit');
+    // Trigger on mouse movement toward browser chrome (nearTop)
+    // OR when truly leaving the document (leavingDoc) but not to another element on the page
+    if (nearTop || (leavingDoc && e.clientY <= threshold * 3)) {
+      trigger('exit');
+    }
   };
 
   if (!suppressAuto) {
