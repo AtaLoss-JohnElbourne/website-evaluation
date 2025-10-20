@@ -995,7 +995,10 @@
     const threshold = (typeof CONFIG.topThresholdPx === 'number' ? CONFIG.topThresholdPx : 10);
     const nearTop = e.clientY <= threshold;
     const leavingDoc = e.relatedTarget === null;
-    if (nearTop || leavingDoc) trigger('exit');
+    
+    // Only trigger on mouse movement toward browser chrome (nearTop), 
+    // not when clicking links within the site (leavingDoc)
+    if (nearTop && !leavingDoc) trigger('exit');
   };
 
   if (!suppressAuto) {
