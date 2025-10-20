@@ -16,7 +16,7 @@
     // UI Text & Labels
     ui: {
       title: 'Website Survey',
-      subtitle: "To improve our website, we're running this survey for two weeks.",
+      subtitle: "To improve our website, we're running this survey for two weeks.\n\nPlease help us by taking 1 minute to answer:",
       step1Instruction: 'Choose one option:',
       requiredIndicator: '(required)',
       otherPlaceholder: 'Please explain...',
@@ -57,8 +57,8 @@
     // Step 2 questions
     step2: {
       visitingReasons: {
-        question: 'Why are you visiting ataloss.org?',
-        subtitle: '(Tick all that are relevant)',
+        question: 'Why are you visiting AtaLoss.org?',
+        subtitle: '(tick all that are relevant)',
         options: [
           {id: 'bereavement_services', label: 'To find bereavement services/information'},
           {id: 'memorial_page', label: 'To set up a memorial page'},
@@ -72,8 +72,8 @@
         ]
       },
       visitingFor: {
-        question: 'I am visiting ataloss.org',
-        subtitle: '(Tick all that are relevant)',
+        question: 'I am visiting AtaLoss.org:',
+        subtitle: '(tick all that are relevant)',
         options: [
           {id: 'myself', label: 'For myself'},
           {id: 'friend_family', label: 'For a friend or family member'},
@@ -82,14 +82,15 @@
         ]
       },
       heardWhere: {
-        question: 'Where did you first hear about this website?',
+        question: 'Where did you first hear about this website:',
         options: [
           {id: '', label: 'Select an option'},
           {id: 'search_engine', label: 'Search engine'},
           {id: 'media_social', label: 'Media/social media'},
           {id: 'friend_family', label: 'Friend or family'},
-          {id: 'professional', label: 'Professional'},
-          {id: 'newsletter_email', label: 'Newsletter/email'},
+          {id: 'support_professional', label: 'Support Professional'},
+          {id: 'organisation', label: 'Organisation'},
+          {id: 'ataloss_newsletter', label: 'AtaLoss newsletter/email'},
           {id: 'other_heard', label: 'Other (please explain)', hasOther: true}
         ]
       }
