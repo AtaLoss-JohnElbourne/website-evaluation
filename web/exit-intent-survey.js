@@ -540,11 +540,11 @@
     if (!step2) return {};
     const fd = new FormData(step2);
     
-    // Collect checkbox values for visiting reasons
+    // Collect checkbox values for visiting reasons (intent)
     const visitingReasons = [...step2.querySelectorAll('input[name="visiting_reasons"]:checked')].map(cb => cb.value);
     const visitingReasonsOther = fd.get('visiting_reasons_other') || null;
     
-    // Collect checkbox values for visiting for
+    // Collect checkbox values for visiting for (audience)
     const visitingFor = [...step2.querySelectorAll('input[name="visiting_for"]:checked')].map(cb => cb.value);
     const visitingForOther = fd.get('visiting_for_other') || null;
     
@@ -552,10 +552,14 @@
     const heardWhere = fd.get('heardWhere') || null;
     const heardWhereOther = fd.get('heard_where_other') || null;
     
+    // Format arrays as comma-separated strings for Excel compatibility
+    const intentStr = visitingReasons.length ? visitingReasons.join(', ') : null;
+    const audienceStr = visitingFor.length ? visitingFor.join(', ') : null;
+    
     return {
-      visitingReasons: visitingReasons.length ? visitingReasons : null,
+      intent: intentStr,  // Maps visitingReasons to intent field expected by server
       visitingReasonsOther: visitingReasonsOther,
-      visitingFor: visitingFor.length ? visitingFor : null,
+      audience: audienceStr,  // Maps visitingFor to audience field expected by server
       visitingForOther: visitingForOther,
       heardWhere: heardWhere,
       heardWhereOther: heardWhereOther
