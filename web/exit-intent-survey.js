@@ -381,8 +381,8 @@
   // Update FAB text based on survey state
   const updateFabText = () => {
     const hasShown = sessionAlreadyShown();
-    if (hasShown) {
-      fab.textContent = 'Feedback.'; // Dot after = already triggered
+    if (hasShown || suppressAuto) {
+      fab.textContent = 'Feedback.'; // Dot after = already triggered or suppressed by TTL
       fab.setAttribute('aria-label', 'Give feedback (survey completed)');
     } else if (armed) {
       fab.textContent = '.Feedback'; // Dot before = armed and ready
@@ -975,9 +975,9 @@
     }
   };
 
-  const markSessionShown = () => { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch(_){} };
+  const markSessionShown = () => { try { localStorage.setItem(SESSION_KEY, '1'); } catch(_){} };
   const sessionAlreadyShown = () => {
-    try { return CONFIG.oncePerSession && sessionStorage.getItem(SESSION_KEY) === '1'; }
+    try { return CONFIG.oncePerSession && localStorage.getItem(SESSION_KEY) === '1'; }
     catch(_) { return false; }
   };
   const canShow = () => !fired && !sessionAlreadyShown();
