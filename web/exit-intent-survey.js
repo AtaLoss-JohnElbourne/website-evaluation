@@ -542,15 +542,15 @@
     
     // Collect checkbox values for visiting reasons (intent)
     const visitingReasons = [...step2.querySelectorAll('input[name="visiting_reasons"]:checked')].map(cb => cb.value);
-    const visitingReasonsOther = fd.get('visiting_reasons_other') || null;
+    const visitingReasonsOther = (fd.get('visiting_reasons_other') || '').trim();
     
     // Collect checkbox values for visiting for (audience)
     const visitingFor = [...step2.querySelectorAll('input[name="visiting_for"]:checked')].map(cb => cb.value);
-    const visitingForOther = fd.get('visiting_for_other') || null;
+    const visitingForOther = (fd.get('visiting_for_other') || '').trim();
     
     // Collect dropdown value and other text
     const heardWhere = fd.get('heardWhere') || null;
-    const heardWhereOther = fd.get('heard_where_other') || null;
+    const heardWhereOther = (fd.get('heard_where_other') || '').trim();
     
     // Format arrays as comma-separated strings for Excel compatibility
     const intentStr = visitingReasons.length ? visitingReasons.join(', ') : null;
@@ -558,11 +558,12 @@
     
     return {
       intent: intentStr,  // Maps visitingReasons to intent field expected by server
-      visitingReasonsOther: visitingReasonsOther,
       audience: audienceStr,  // Maps visitingFor to audience field expected by server
-      visitingForOther: visitingForOther,
       heardWhere: heardWhere,
-      heardWhereOther: heardWhereOther
+      // Other text fields for comments consolidation
+      _visitingReasonsOther: visitingReasonsOther,
+      _visitingForOther: visitingForOther,
+      _heardWhereOther: heardWhereOther
     };
   };
 
@@ -571,22 +572,42 @@
     if (!step3) return {};
     const fd = new FormData(step3);
     const barriers = [...step3.querySelectorAll('input[name="barriers"]:checked')].map(cb => cb.value);
-    const barriersOther = fd.get('barriers_other') || null;
+    const barriersOther = (fd.get('barriers_other') || '').trim();
     
-    // Get step 3 comments (hidden textarea)
-    const step3Comments = (fd.get('comments') || '').trim() || null;
+    // Consolidate all free-text comments into one field with labels
+    const commentsParts = [];
     
-    // Get step 1 comments if they exist and have priority
+    // Step 1 comments (low rating feedback)
     const step1Data = collectStep1();
-    const finalComments = step1Data.comments || step3Comments;
+    if (step1Data.comments) {
+      commentsParts.push(`Low rating feedback: ${step1Data.comments}`);
+    }
+    
+    // Step 2 "other" fields
+    const step2Data = collectStep2();
+    if (step2Data._visitingReasonsOther) {
+      commentsParts.push(`Why visiting - Other: ${step2Data._visitingReasonsOther}`);
+    }
+    if (step2Data._visitingForOther) {
+      commentsParts.push(`Visiting for - Other: ${step2Data._visitingForOther}`);
+    }
+    if (step2Data._heardWhereOther) {
+      commentsParts.push(`Heard where - Other: ${step2Data._heardWhereOther}`);
+    }
+    
+    // Step 3 barriers other
+    if (barriersOther) {
+      commentsParts.push(`Barriers - Other: ${barriersOther}`);
+    }
+    
+    const consolidatedComments = commentsParts.length > 0 ? commentsParts.join('\n') : null;
     
     return {
       ageGroup:  fd.get('ageGroup') || null,
       gender:    fd.get('gender')   || null,
       ethnicity: fd.get('ethnicity')|| null,
       barriers:  barriers.length ? barriers : null,
-      barriersOther: barriersOther,
-      comments:  finalComments
+      comments:  consolidatedComments
     };
   };
 
