@@ -986,6 +986,259 @@ app.get('/api/test-sharepoint', async (req, res) => {
   }
 });
 
+// Helper endpoint to list worksheets and tables in the Excel file
+app.get('/api/list-worksheets', debugAuth, async (req, res) => {
+  try {
+    // Get site and drive using the working approach
+    const siteUrl = process.env.SHAREPOINT_SITE_URL;
+    let site;
+    try {
+      const hostname = new URL(siteUrl).hostname;
+      const sitePath = '/sites/WebsiteEvaluation';
+      site = await callGraphAPI(`/sites/${hostname}:${sitePath}`);
+    } catch (error) {
+      site = await callGraphAPI(`/sites/atalossaal.sharepoint.com:/sites/WebsiteEvaluation`);
+    }
+    
+    const drives = await callGraphAPI(`/sites/${site.id}/drives`);
+    const drive = drives.value.find(d => d.name === 'Documents' || d.webUrl.includes('Shared%20Documents'));
+    
+    if (!drive) {
+      throw new Error('Documents drive not found');
+    }
+    
+    // Get file using the working approach
+    const fileInfo = await callGraphAPI(`/drives/${drive.id}/root:/Website Evaluation.xlsx`);
+    
+    // Create workbook session
+    const session = await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/createSession`,
+      'POST',
+      { persistChanges: false }
+    );
+    
+    // Get all worksheets
+    const worksheets = await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets`,
+      'GET',
+      null,
+      { 'workbook-session-id': session.id }
+    );
+    
+    // Get tables for each worksheet
+    const worksheetData = [];
+    for (const ws of worksheets.value) {
+      try {
+        const tables = await callGraphAPI(
+          `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${ws.name}')/tables`,
+          'GET',
+          null,
+          { 'workbook-session-id': session.id }
+        );
+        worksheetData.push({
+          worksheetName: ws.name,
+          tables: tables.value.map(t => t.name)
+        });
+      } catch (err) {
+        worksheetData.push({
+          worksheetName: ws.name,
+          tables: [],
+          error: 'Could not retrieve tables'
+        });
+      }
+    }
+    
+    // Close session
+    await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/closeSession`,
+      'POST',
+      null,
+      { 'workbook-session-id': session.id }
+    );
+    
+    res.status(200).json({
+      success: true,
+      file: process.env.EXCEL_FILE_PATH,
+      currentConfig: {
+        WORKSHEET_NAME: process.env.WORKSHEET_NAME,
+        TABLE_NAME: process.env.TABLE_NAME
+      },
+      worksheets: worksheetData
+    });
+    
+  } catch (error) {
+    console.error('List worksheets failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to list worksheets',
+      message: error.message,
+      details: error.response?.data || 'No additional details'
+    });
+  }
+});
+
+// Helper endpoint to copy table structure to a new sheet
+app.post('/api/copy-table-structure', debugAuth, async (req, res) => {
+  try {
+    const { newSheetName, newTableName } = req.body;
+    
+    if (!newSheetName || !newTableName) {
+      return res.status(400).json({
+        success: false,
+        error: 'Both newSheetName and newTableName are required'
+      });
+    }
+
+    // Get site and drive using the working approach
+    const siteUrl = process.env.SHAREPOINT_SITE_URL;
+    let site;
+    try {
+      const hostname = new URL(siteUrl).hostname;
+      const sitePath = '/sites/WebsiteEvaluation';
+      site = await callGraphAPI(`/sites/${hostname}:${sitePath}`);
+    } catch (error) {
+      site = await callGraphAPI(`/sites/atalossaal.sharepoint.com:/sites/WebsiteEvaluation`);
+    }
+    
+    const drives = await callGraphAPI(`/sites/${site.id}/drives`);
+    const drive = drives.value.find(d => d.name === 'Documents' || d.webUrl.includes('Shared%20Documents'));
+    
+    if (!drive) {
+      throw new Error('Documents drive not found');
+    }
+    
+    // Get file using the working approach
+    const fileInfo = await callGraphAPI(`/drives/${drive.id}/root:/Website Evaluation.xlsx`);
+    
+    // Create workbook session
+    const session = await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/createSession`,
+      'POST',
+      { persistChanges: true }
+    );
+    
+    // Get current table structure
+    const currentWorksheet = process.env.WORKSHEET_NAME || 'Sheet1';
+    const currentTable = process.env.TABLE_NAME || 'Table1';
+    
+    console.log(`Attempting to access worksheet: "${currentWorksheet}" and table: "${currentTable}"`);
+    
+    let tableInfo;
+    try {
+      tableInfo = await callGraphAPI(
+        `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${currentWorksheet}')/tables('${currentTable}')`,
+        'GET',
+        null,
+        { 'workbook-session-id': session.id }
+      );
+    } catch (error) {
+      // List available worksheets and tables for debugging
+      const worksheets = await callGraphAPI(
+        `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets`,
+        'GET',
+        null,
+        { 'workbook-session-id': session.id }
+      );
+      
+      const worksheetNames = worksheets.value.map(ws => ws.name);
+      
+      // Close session before throwing error
+      await callGraphAPI(
+        `/drives/${drive.id}/items/${fileInfo.id}/workbook/closeSession`,
+        'POST',
+        null,
+        { 'workbook-session-id': session.id }
+      );
+      
+      throw new Error(`Worksheet or table not found. Available worksheets: ${worksheetNames.join(', ')}. Looking for worksheet: "${currentWorksheet}" and table: "${currentTable}"`);
+    }
+    
+    // Get table columns
+    const columns = await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${currentWorksheet}')/tables('${currentTable}')/columns`,
+      'GET',
+      null,
+      { 'workbook-session-id': session.id }
+    );
+    
+    const columnNames = columns.value.map(col => col.name);
+    
+    // Check if new sheet already exists
+    let newSheet;
+    try {
+      newSheet = await callGraphAPI(
+        `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${newSheetName}')`,
+        'GET',
+        null,
+        { 'workbook-session-id': session.id }
+      );
+    } catch (error) {
+      // Sheet doesn't exist, create it
+      newSheet = await callGraphAPI(
+        `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets/add`,
+        'POST',
+        { name: newSheetName },
+        { 'workbook-session-id': session.id }
+      );
+    }
+    
+    // Create table with the same column structure
+    const newTable = await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${newSheetName}')/tables/add`,
+      'POST',
+      {
+        address: `A1:${String.fromCharCode(65 + columnNames.length - 1)}1`,
+        hasHeaders: true
+      },
+      { 'workbook-session-id': session.id }
+    );
+    
+    // Rename the table
+    await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${newSheetName}')/tables('${newTable.name}')`,
+      'PATCH',
+      { name: newTableName },
+      { 'workbook-session-id': session.id }
+    );
+    
+    // Set column headers
+    await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/worksheets('${newSheetName}')/tables('${newTableName}')/headerRowRange`,
+      'PATCH',
+      { values: [columnNames] },
+      { 'workbook-session-id': session.id }
+    );
+    
+    // Close session
+    await callGraphAPI(
+      `/drives/${drive.id}/items/${fileInfo.id}/workbook/closeSession`,
+      'POST',
+      null,
+      { 'workbook-session-id': session.id }
+    );
+    
+    res.status(200).json({
+      success: true,
+      message: 'Table structure copied successfully',
+      details: {
+        newSheetName,
+        newTableName,
+        columnsCopied: columnNames.length,
+        columns: columnNames
+      }
+    });
+    
+  } catch (error) {
+    console.error('Copy table structure failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to copy table structure',
+      message: error.message,
+      details: error.response?.data || 'No additional details'
+    });
+  }
+});
+
 // Default route
 app.get('/', (req, res) => {
   res.json({
@@ -993,7 +1246,8 @@ app.get('/', (req, res) => {
     endpoints: {
       'POST /api/survey': 'Submit survey data',
       'GET /api/health': 'Health check',
-      'GET /api/test-sharepoint': 'Test SharePoint connection'
+      'GET /api/test-sharepoint': 'Test SharePoint connection',
+      'POST /api/copy-table-structure': 'Copy table structure to new sheet (requires DEBUG_PASSWORD)'
     }
   });
 });

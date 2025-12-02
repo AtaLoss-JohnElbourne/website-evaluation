@@ -42,7 +42,7 @@
 
     // Frequency capping
     ttlDays: 28,              // don't auto-show again for this many days (set to 28 for 2-week survey campaign)
-    surveyId: 'exit-survey-v2',
+    surveyId: 'exit-survey-v2.1',
 
     // Step 1 question
     question: 'How helpful was your visit today?',
@@ -202,7 +202,7 @@
   [hidden] { display:none !important; }
 
   .es-fab {
-    position: fixed; right: 16px; bottom: 16px; z-index: 2147483000;
+    position: fixed; left: 16px; bottom: 16px; z-index: 2147483000;
     background: var(--es-brand); color: #fff; border: 0; border-radius: 14px;
     padding: 12px 16px; font: 600 15px/1.1 var(--es-font);
     box-shadow: 0 10px 25px rgba(0,0,0,.15); cursor: pointer;
