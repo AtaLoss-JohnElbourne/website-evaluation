@@ -22,8 +22,6 @@ services:
       - DEBUG_PASSWORD=${DEBUG_PASSWORD}
     env_file:
       - .env
-    networks:
-      - frontend
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
@@ -37,8 +35,6 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
-    networks:
-      - frontend
     depends_on:
       - survey-api
     healthcheck:
@@ -47,7 +43,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-networks:
-  frontend:
-    driver: bridge

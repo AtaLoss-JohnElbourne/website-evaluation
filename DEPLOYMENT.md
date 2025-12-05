@@ -87,21 +87,27 @@ NODE_ENV=production
 
 ### 5. Configure Nginx
 
-Copy the nginx configuration:
+Add the configuration to your nginx container's config directory:
+
 ```bash
-sudo cp /home/ubuntu/website-evaluation/nginx/apps-ataloss.conf /etc/nginx/sites-available/apps-ataloss
-sudo ln -s /etc/nginx/sites-available/apps-ataloss /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+# Find your nginx config volume location
+docker inspect nginx | grep -A 5 "Mounts"
+
+# Common locations:
+# /home/ubuntu/apps/nginx/conf.d/
+# /etc/nginx/conf.d/ (if bind-mounted)
+
+# Copy the config (adjust path to match your setup)
+sudo cp /home/ubuntu/website-evaluation/nginx/apps-ataloss.conf /home/ubuntu/apps/nginx/conf.d/apps-ataloss.conf
+
+# Test and reload nginx in container
+docker exec nginx nginx -t
+docker exec nginx nginx -s reload
 ```
 
 ### 6. Setup SSL with Certbot
 
-```bash
-sudo certbot --nginx -d apps.ataloss.org
-```
-
-Follow the prompts. Certbot will automatically modify the nginx configuration to add SSL.
+Your SSL is already managed by your certbot container. Just ensure the domain `apps.ataloss.org` is configured in your certbot setup.
 
 ### 7. Make Deployment Script Executable
 
