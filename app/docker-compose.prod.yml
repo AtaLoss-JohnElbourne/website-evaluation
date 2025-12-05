@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
+    networks:
+      - apps-network
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -35,6 +37,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
+    networks:
+      - apps-network
     depends_on:
       - survey-api
     healthcheck:
@@ -43,3 +47,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+networks:
+  apps-network:
+    external: true
+    name: apps-network
