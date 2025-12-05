@@ -178,10 +178,11 @@
     }
   };
 
-  /* --- Do not run on Squarespace domains --- */
+  /* --- Do not run on Squarespace domains or counsellor page --- */
   const host = location.hostname;
   const isSquarespace = (host === 'squarespace.com') || host.endsWith('.squarespace.com');
-  if (isSquarespace) return;
+  const isCounsellorPage = location.pathname === '/find-support/talk-to-a-counsellor';
+  if (isSquarespace || isCounsellorPage) return;
 
   /* -------------------  GUARD: TTL / SESSION  ------------------- */
   const LS_KEY = `exitSurvey:${CONFIG.surveyId}`;
