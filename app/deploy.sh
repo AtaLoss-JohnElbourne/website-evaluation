@@ -11,7 +11,7 @@ echo "🚀 Starting deployment..."
 GITHUB_REGISTRY="ghcr.io"
 GITHUB_USER="ataloss-johnelbourne"
 REPO_NAME="website-evaluation"
-PROJECT_DIR="/home/ubuntu/website-evaluation/app"
+PROJECT_DIR="/home/ubuntu/apps/website-evaluation/app"
 
 # Colors for output
 GREEN='\033[0;32m'
