@@ -11,7 +11,7 @@ echo "🚀 Starting deployment..."
 GITHUB_REGISTRY="ghcr.io"
 GITHUB_USER="ataloss-johnelbourne"
 REPO_NAME="website-evaluation"
-PROJECT_DIR="/home/ubuntu/apps/website-evaluation/app"
+PROJECT_DIR="/home/ubuntu/apps/website-evaluation"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -48,11 +48,11 @@ docker pull ${GITHUB_REGISTRY}/${GITHUB_USER}/${REPO_NAME}/survey-web:latest || 
 
 # Stop existing containers
 print_step "Stopping existing containers..."
-docker-compose -f docker-compose.prod.yml down || print_warning "No containers to stop"
+docker compose -f docker-compose.prod.yml down || print_warning "No containers to stop"
 
 # Start new containers
 print_step "Starting new containers..."
-docker-compose -f docker-compose.prod.yml up -d || { print_error "Failed to start containers"; exit 1; }
+docker compose -f docker-compose.prod.yml up -d || { print_error "Failed to start containers"; exit 1; }
 
 # Wait for health checks
 print_step "Waiting for containers to be healthy..."
@@ -60,7 +60,7 @@ sleep 10
 
 # Check container status
 print_step "Checking container status..."
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 
 # Check if containers are running
 if docker ps | grep -q "survey_api"; then
@@ -87,7 +87,7 @@ echo ""
 print_step "Deployment completed successfully! 🎉"
 echo ""
 echo "Container Status:"
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 echo ""
 echo "API Health: http://localhost:3000/api/health"
 echo "Web Static: http://localhost:8080/exit-intent-survey.js"

@@ -252,6 +252,25 @@ sudo tail -f /var/log/nginx/apps-ataloss-error.log
 echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
 
+## Testing
+
+After deployment, you can test the survey:
+
+**Static files served via /survey-web/:**
+- `https://apps.ataloss.org/survey-web/exit-intent-survey.js` - Main survey script
+- `https://apps.ataloss.org/survey-web/test-survey.html` - Test page
+
+**API endpoints via /survey-api/:**
+- `https://apps.ataloss.org/survey-api/survey` - Survey submission endpoint
+- `https://apps.ataloss.org/survey-api/health` - Health check
+
+To deploy the test page to your server:
+```bash
+# Copy test page to the web container's directory
+scp h:\aal\website-evaluation\test-survey.html ubuntu@apps.ataloss.org:/home/ubuntu/apps/website-evaluation/
+# Or add to web/ directory and rebuild the image
+```
+
 ## Updating the Application
 
 1. Make changes locally

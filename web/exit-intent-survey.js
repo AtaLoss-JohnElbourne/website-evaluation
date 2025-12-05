@@ -35,7 +35,7 @@
 
     // API Configuration
     api: {
-      endpoint: 'https://apps.ataloss.org/survey-api/api/survey',
+      endpoint: 'https://apps.ataloss.org/survey-api/survey',
       method: 'POST',
       headers: {'Content-Type': 'application/json'}
     },

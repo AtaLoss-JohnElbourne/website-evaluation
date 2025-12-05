@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exit Survey Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            color: #6D5DF6;
+            border-bottom: 3px solid #6D5DF6;
+            padding-bottom: 10px;
+        }
+        .info-box {
+            background: #f0f0f0;
+            border-left: 4px solid #6D5DF6;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #6D5DF6;
+        }
+        .test-controls {
+            background: #fff;
+            border: 2px solid #6D5DF6;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .test-controls h3 {
+            margin-top: 0;
+        }
+        button {
+            background: #6D5DF6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #5a4dd4;
+        }
+        button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        button.secondary:hover {
+            background: #d0d0d0;
+        }
+        .content {
+            margin: 40px 0;
+        }
+        .content p {
+            margin: 20px 0;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exit Survey Test Page</h1>
+    
+    <div class="info-box">
+        <h3>📋 Testing Instructions</h3>
+        <p><strong>The survey will trigger automatically when you:</strong></p>
+        <ul>
+            <li>Move your mouse to the top of the browser window (exit intent)</li>
+            <li>Stay on the page for 10 seconds (arming delay)</li>
+            <li>On mobile: Wait 45 seconds (fallback timer)</li>
+        </ul>
+        <p><strong>Or use the manual controls below to test immediately.</strong></p>
+    </div>
+
+    <div class="test-controls">
+        <h3>🧪 Manual Test Controls</h3>
+        <p>Use these buttons to test the survey functionality:</p>
+        
+        <button onclick="openSurvey()">Open Survey Now</button>
+        <button onclick="resetSession()" class="secondary">Reset Session</button>
+        <button onclick="checkStatus()" class="secondary">Check Status</button>
+        <button onclick="clearStorage()" class="secondary">Clear All Data</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <div class="content">
+        <h2>Sample Content</h2>
+        <p>This is a test page for the AtaLoss.org exit intent survey. The survey should appear when you move your cursor toward the top of the browser window to leave the page, or after you've been on the page for a certain amount of time.</p>
+        
+        <p>The feedback button should appear in the <strong>bottom-left corner</strong> of the page. It will show:</p>
+        <ul>
+            <li><code>Feedback</code> - Not armed yet (first 10 seconds)</li>
+            <li><code>.Feedback</code> - Armed and ready (dot before)</li>
+            <li><code>Feedback.</code> - Already shown or suppressed by 28-day TTL (dot after)</li>
+        </ul>
+
+        <h3>Testing Different Scenarios</h3>
+        <p><strong>Scenario 1: First-time visitor</strong></p>
+        <ul>
+            <li>Clear all data using the button above</li>
+            <li>Refresh the page</li>
+            <li>Wait 10 seconds for the survey to arm</li>
+            <li>Move mouse to top of window - survey should appear</li>
+        </ul>
+
+        <p><strong>Scenario 2: Returning visitor (within 28 days)</strong></p>
+        <ul>
+            <li>Complete the survey once</li>
+            <li>Try to trigger it again - it should NOT auto-trigger</li>
+            <li>But you CAN still click the Feedback button manually</li>
+        </ul>
+
+        <p><strong>Scenario 3: Manual feedback</strong></p>
+        <ul>
+            <li>Click the "Feedback" button in bottom-left corner</li>
+            <li>Survey should open regardless of TTL or session state</li>
+        </ul>
+
+        <h3>Console Debugging</h3>
+        <p>Open the browser console (F12) to see debug messages. Enable debug mode by setting:</p>
+        <code>CONFIG.debug = true</code>
+        <p>in the exit-intent-survey.js file.</p>
+
+        <h3>API Endpoint</h3>
+        <p>Survey submissions are sent to: <code>https://apps.ataloss.org/survey-api/survey</code></p>
+        <p>You can verify the endpoint is working by checking:</p>
+        <ul>
+            <li><a href="https://apps.ataloss.org/survey-api/health" target="_blank">Health Check</a></li>
+            <li>Network tab in browser dev tools when submitting</li>
+        </ul>
+
+        <h3>LocalStorage Inspection</h3>
+        <p>The survey uses localStorage to track:</p>
+        <ul>
+            <li><code>exitSurvey:exit-survey-v2.1</code> - Last submission timestamp and count</li>
+            <li><code>exitSurvey:session:exit-survey-v2.1</code> - Session flag (shown this tab?)</li>
+        </ul>
+        <p>Open browser dev tools → Application → Local Storage → file:// to inspect</p>
+    </div>
+
+    <div class="content" style="margin-top: 100px; padding: 40px 0; border-top: 2px solid #eee;">
+        <h2>Additional Test Content</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Scroll down to see more content and test the survey behavior with a longer page...</p>
+        <p style="margin-top: 60px;">More content here to make the page scrollable and realistic.</p>
+        <p>The survey should work regardless of scroll position.</p>
+    </div>
+
+    <!-- Load the exit survey script -->
+    <!-- For local testing, use local file. For production testing, use: https://apps.ataloss.org/survey-web/exit-intent-survey.js -->
+    <script src="web/exit-intent-survey.js"></script>
+
+    <!-- Test controls script -->
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.textContent = message;
+            setTimeout(() => {
+                statusDiv.className = 'status';
+                statusDiv.textContent = '';
+            }, 5000);
+        }
+
+        function openSurvey() {
+            if (window.ExitSurvey) {
+                window.ExitSurvey.open();
+                showStatus('✓ Survey opened manually', 'success');
+            } else {
+                showStatus('✗ ExitSurvey not loaded yet. Wait a moment and try again.', 'error');
+            }
+        }
+
+        function resetSession() {
+            if (window.ExitSurvey) {
+                window.ExitSurvey.resetSession();
+                showStatus('✓ Session reset - survey can trigger again', 'success');
+            } else {
+                showStatus('✗ ExitSurvey not loaded yet', 'error');
+            }
+        }
+
+        function checkStatus() {
+            const surveyData = localStorage.getItem('exitSurvey:exit-survey-v2.1');
+            const sessionData = localStorage.getItem('exitSurvey:session:exit-survey-v2.1');
+            
+            if (surveyData) {
+                const data = JSON.parse(surveyData);
+                const daysSince = (Date.now() - data.lastTs) / (1000 * 60 * 60 * 24);
+                showStatus(`Last submitted ${daysSince.toFixed(1)} days ago (count: ${data.count})`, 'info');
+            } else {
+                showStatus('No previous submissions found', 'info');
+            }
+            
+            console.log('Survey data:', surveyData);
+            console.log('Session data:', sessionData);
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('exitSurvey:exit-survey-v2.1');
+            localStorage.removeItem('exitSurvey:session:exit-survey-v2.1');
+            sessionStorage.removeItem('exitSurvey:siteTimer:exit-survey-v2.1');
+            showStatus('✓ All survey data cleared - refresh page for clean test', 'success');
+        }
+
+        // Log when script loads
+        window.addEventListener('load', () => {
+            console.log('%c🚀 Exit Survey Test Page Loaded', 'color: #6D5DF6; font-size: 16px; font-weight: bold;');
+            console.log('%cTo manually trigger survey: ExitSurvey.open()', 'color: #666;');
+            console.log('%cTo reset session: ExitSurvey.resetSession()', 'color: #666;');
+            
+            setTimeout(() => {
+                if (window.ExitSurvey) {
+                    console.log('%c✓ Exit Survey loaded successfully', 'color: green; font-weight: bold;');
+                } else {
+                    console.log('%c⚠ Exit Survey not loaded - check network tab', 'color: orange; font-weight: bold;');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
