@@ -12,6 +12,7 @@ GITHUB_REGISTRY="ghcr.io"
 GITHUB_USER="ataloss-johnelbourne"
 REPO_NAME="website-evaluation"
 PROJECT_DIR="/home/ubuntu/apps/website-evaluation"
+NGINX_DIR="/home/ubuntu/apps/nginx"
 
 # Colors for output
 GREEN='\033[0;32m'
