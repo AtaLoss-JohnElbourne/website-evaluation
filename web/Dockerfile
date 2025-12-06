@@ -1,8 +1,9 @@
 # Static file server for exit-intent-survey.js
 FROM nginx:alpine
 
-# Copy the JavaScript file to nginx html directory
+# Copy the JavaScript file and test page to nginx html directory
 COPY exit-intent-survey.js /usr/share/nginx/html/
+COPY test-survey.html /usr/share/nginx/html/
 
 # Create a simple nginx config for serving static files
 RUN echo 'server { \
